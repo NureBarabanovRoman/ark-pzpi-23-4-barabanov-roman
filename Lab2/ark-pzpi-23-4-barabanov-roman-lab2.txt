@@ -1,1 +1,546 @@
+МІНІСТЕРСТВО ОСВІТИ І НАУКИ УКРАЇНИ
+ХАРКІВСЬКИЙ НАЦІОНАЛЬНИЙ УНІВЕРСИТЕТ РАДІОЕЛЕКТРОНІКИ
+КАФЕДРА ПРОГРАМНОЇ ІНЖЕНЕРІЇ
+
+
+
+
+
+ЗВІТ
+До лабораторної роботи №2
+З дисципліни «Аналіз та рефакторинг коду»
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Виконав:
+ст. гр. ПЗПІ-23-4
+Барабанов Р.П.
+
+Перевірив:
+Ст. викладач кафедри ПІ
+Сокорчук Ігор Петрович
+
+
+
+
+
+
+
+
+
+
+
+
+Харків – 2025
+2 ЗАВДАННЯ
+     Метою даної роботи є отримання практичного досвіду розробки серверної частини програмної системи, що охоплює проєктування бази даних, побудову UML- та ER-діаграм, реалізацію й тестування API для взаємодії з клієнтськими застосунками та IoT-пристроями, а також використання Git-репозиторіїв і підготовку технічної документації.
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+3 ОПИС ВИКОНАНОЇ РОБОТИ
+     Темою проєкту для виконання лабораторних робіт є програмна система для проведення швидких опитувань із використанням технологій IoT. Першим кроком при розробці програмної системи є розробка її будови (див. рис. 3.1).
+
+Рисунок 3.1- UML-діаграма прецедентів серверної складової системи
+Опис Моделей Даних
+Модель User (Користувач)
+User — зареєстрований користувач системи (викладач або адміністратор), який створює опитування. Основні атрибути:
+* id — унікальний ідентифікатор (UUID)
+* email — електронна пошта (унікальна)
+* hashed_password — хеш паролю
+* role — роль у системі (admin/user)
+* created_at — дата реєстрації
+Модель Poll (Опитування)
+Poll — сутність опитування, яке прив'язане до конкретного приміщення. Основні атрибути:
+* id — унікальний ідентифікатор (UUID)
+* title — заголовок опитування
+* description — опис
+* room_id — ідентифікатор фізичного приміщення (аудиторії)
+* owner_id — автор опитування (Foreign Key -> User)
+* is_active — статус активності
+* created_at — дата створення
+Модель Option (Варіант відповіді) 
+Option — варіант відповіді в рамках опитування. Основні атрибути:
+* id — унікальний ідентифікатор (UUID)
+* poll_id — посилання на опитування (Foreign Key -> Poll)
+* text — текст варіанту
+* vote_count — лічильник голосів (кешування)
+Модель Vote (Голос) 
+Vote — факт голосування з пристрою. Основні атрибути:
+* id — унікальний ідентифікатор (UUID)
+* poll_id — опитування (Foreign Key -> Poll)
+* option_id — обраний варіант (Foreign Key -> Option)
+* device_id — пристрій, з якого віддано голос (Foreign Key -> Device)
+* created_at — час голосування
+Модель Device (IoT Пристрій) 
+Device — фізичний пристрій (кнопка, термінал), прив'язаний до кімнати. Основні атрибути:
+* id — унікальний ідентифікатор пристрою (MAC-адреса або Serial ID)
+* room_id — приміщення, де знаходиться пристрій
+* last_seen — час останньої активності
+Для серверної частини системи розроблено UML-діаграму прецедентів, яка відображає основні сценарії взаємодії користувачів та IoT-пристроїв із системою (див. рис. 3.1 вище).
+Побудуємо ER-діаграму даних, у межах якої буде визначено основні сутності, їхні атрибути та взаємозв’язки між ними в базі даних (див. рис. 3.2).
+
+Рисунок 3.2- ER діаграма структури даних
+На основі ER-діаграми виконано проєктування таблиць бази даних. У першій нормальній формі (1NF) кожен стовпець містить лише атомарні значення. У другій нормальній формі (2NF) відсутні часткові залежності від складеного ключа (використовуються UUID). У третій нормальній формі (3NF) відсутні транзитивні залежності. Схема повністю нормалізована.
+Побудовано діаграму структури бази даних PostgreSQL. На ній відображено всі таблиці, їхні взаємозв'язки та типи даних (див. рис. 3.3).
+
+Рисунок 3.3- Діаграма БД
+При створенні API застосовано архітектурний стиль REST.
+
+
+
+
+
+4 ВИСНОВКИ
+     У ході виконання лабораторної роботи було опановано та реалізовано повний цикл розробки серверної частини програмної системи. Виконано проєктування реляційної бази даних PostgreSQL, розроблено RESTful API на базі FastAPI для взаємодії з клієнтськими застосунками та IoT-пристроями. Реалізовано механізм "розумного голосування" з автоматичним визначенням контексту за room_id. Здобуто практичні навички створення діаграм, роботи з ORM SQLAlchemy та підготовки технічної документації.
+
+
+
+
+
+
+
+
+
+
+
+
+
+5 ВИКОРИСТАНІ ДЖЕРЕЛА
+1. Vision and Scope: Uk-v2. Харків: Харківський національний університет радіоелектроніки, 2024. URL: https://dl.nure.ua/pluginfile.php/1138788/mod_resource/content/1/Vision_and_Scope_uk-v2.pdf
+2. IEEE Std 830-1998 — IEEE Recommended Practice for Software Requirements Specifications.
+3. FastAPI Documentation: https://fastapi.tiangolo.com
+4. PostgreSQL Documentation: https://www.postgresql.org/docs/
+5. SQLAlchemy Documentation: https://docs.sqlalchemy.org
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ДОДАТОК А 
+Посилання на відео: https://youtu.be/hf0vGAytUyw
+00:00 – Вступ
+00:10 – Перегляд створених діаграм
+02:45 – Підключення до бази даних
+03:07 – Перегляд бази даних
+03:23 – Перегляд API
+03:40 – Створення опитування
+05:02 – Видалення опитування
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ДОДАТОК Б 
+Код для створення БД:
+1. --
+2. -- PostgreSQL database dump
+3. --
+4.
+5. \restrict glDPHmcdH5rvAiawignhvecJeHFc5WMdDxcHkVrQw0pbQ7unmENqCcHbh2LAaUe
+6.
+7. -- Dumped from database version 18.1
+8. -- Dumped by pg_dump version 18.1
+9.
+10. -- Started on 2025-12-25 22:54:07
+11.
+12. SET statement_timeout = 0;
+13. SET lock_timeout = 0;
+14. SET idle_in_transaction_session_timeout = 0;
+15. SET transaction_timeout = 0;
+16. SET client_encoding = 'UTF8';
+17. SET standard_conforming_strings = on;
+18. SELECT pg_catalog.set_config('search_path', '', false);
+19. SET check_function_bodies = false;
+20. SET xmloption = content;
+21. SET client_min_messages = warning;
+22. SET row_security = off;
+23.
+24. SET default_tablespace = '';
+25.
+26. SET default_table_access_method = heap;
+27.
+28. --
+29. -- TOC entry 222 (class 1259 OID 16618)
+30. -- Name: devices; Type: TABLE; Schema: public; Owner: postgres
+31. --
+32.
+33. CREATE TABLE public.devices (
+34.     id character varying NOT NULL,
+35.     device_type character varying,
+36.     room_id character varying,
+37.     battery_level integer,
+38.     last_seen timestamp without time zone
+39. );
+40.
+41.
+42. ALTER TABLE public.devices OWNER TO postgres;
+43.
+44. --
+45. -- TOC entry 224 (class 1259 OID 16641)
+46. -- Name: options; Type: TABLE; Schema: public; Owner: postgres
+47. --
+48.
+49. CREATE TABLE public.options (
+50.     id character varying NOT NULL,
+51.     poll_id character varying,
+52.     text character varying,
+53.     vote_count integer
+54. );
+55.
+56.
+57. ALTER TABLE public.options OWNER TO postgres;
+58.
+59. --
+60. -- TOC entry 223 (class 1259 OID 16626)
+61. -- Name: polls; Type: TABLE; Schema: public; Owner: postgres
+62. --
+63.
+64. CREATE TABLE public.polls (
+65.     id character varying NOT NULL,
+66.     title character varying,
+67.     description character varying,
+68.     is_active boolean,
+69.     room_id character varying,
+70.     created_at timestamp without time zone,
+71.     owner_id character varying
+72. );
+73.
+74.
+75. ALTER TABLE public.polls OWNER TO postgres;
+76.
+77. --
+78. -- TOC entry 221 (class 1259 OID 16608)
+79. -- Name: system_logs; Type: TABLE; Schema: public; Owner: postgres
+80. --
+81.
+82. CREATE TABLE public.system_logs (
+83.     id integer NOT NULL,
+84.     user_email character varying,
+85.     action character varying,
+86.     details character varying,
+87.     "timestamp" timestamp without time zone
+88. );
+89.
+90.
+91. ALTER TABLE public.system_logs OWNER TO postgres;
+92.
+93. --
+94. -- TOC entry 220 (class 1259 OID 16607)
+95. -- Name: system_logs_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+96. --
+97.
+98. CREATE SEQUENCE public.system_logs_id_seq
+99.     AS integer
+100.    START WITH 1
+101.    INCREMENT BY 1
+102.    NO MINVALUE
+103.    NO MAXVALUE
+104.    CACHE 1;
+105.
+106.
+107. ALTER SEQUENCE public.system_logs_id_seq OWNER TO postgres;
+108.
+109. --
+110. -- TOC entry 4955 (class 0 OID 0)
+111. -- Dependencies: 220
+112. -- Name: system_logs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+113. --
+114.
+115. ALTER SEQUENCE public.system_logs_id_seq OWNED BY public.system_logs.id;
+116.
+117.
+118. --
+119. -- TOC entry 219 (class 1259 OID 16598)
+120. -- Name: users; Type: TABLE; Schema: public; Owner: postgres
+121. --
+122.
+123. CREATE TABLE public.users (
+124.    id character varying NOT NULL,
+125.    email character varying,
+126.    hashed_password character varying,
+127.    role character varying,
+128.    created_at timestamp without time zone
+129. );
+130.
+131.
+132. ALTER TABLE public.users OWNER TO postgres;
+133.
+134. --
+135. -- TOC entry 225 (class 1259 OID 16654)
+136. -- Name: votes; Type: TABLE; Schema: public; Owner: postgres
+137. --
+138.
+139. CREATE TABLE public.votes (
+140.    id character varying NOT NULL,
+141.    poll_id character varying,
+142.    option_id character varying,
+143.    source character varying,
+144.    device_id character varying,
+145.    created_at timestamp without time zone
+146. );
+147.
+148.
+149. ALTER TABLE public.votes OWNER TO postgres;
+150.
+151. --
+152. -- TOC entry 4775 (class 2604 OID 16611)
+153. -- Name: system_logs id; Type: DEFAULT; Schema: public; Owner: postgres
+154. --
+155.
+156. ALTER TABLE ONLY public.system_logs ALTER COLUMN id SET DEFAULT nextval('public.system_logs_id_seq'::regclass);
+157.
+158.
+159. --
+160. -- TOC entry 4946 (class 0 OID 16618)
+161. -- Dependencies: 222
+162. -- Data for Name: devices; Type: TABLE DATA; Schema: public; Owner: postgres
+163. --
+164.
+165. COPY public.devices (id, device_type, room_id, battery_level, last_seen) FROM stdin;
+166. \.
+167.
+168.
+169. --
+170. -- TOC entry 4948 (class 0 OID 16641)
+171. -- Dependencies: 224
+172. -- Data for Name: options; Type: TABLE DATA; Schema: public; Owner: postgres
+173. --
+174.
+175. COPY public.options (id, poll_id, text, vote_count) FROM stdin;
+176. \.
+177.
+178.
+179. --
+180. -- TOC entry 4947 (class 0 OID 16626)
+181. -- Dependencies: 223
+182. -- Data for Name: polls; Type: TABLE DATA; Schema: public; Owner: postgres
+183. --
+184.
+185. COPY public.polls (id, title, description, is_active, room_id, created_at, owner_id) FROM stdin;
+186. \.
+187.
+188.
+189. --
+190. -- TOC entry 4945 (class 0 OID 16608)
+191. -- Dependencies: 221
+192. -- Data for Name: system_logs; Type: TABLE DATA; Schema: public; Owner: postgres
+193. --
+194.
+195. COPY public.system_logs (id, user_email, action, details, "timestamp") FROM stdin;
+196. \.
+197.
+198.
+199. --
+200. -- TOC entry 4943 (class 0 OID 16598)
+201. -- Dependencies: 219
+202. -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
+203. --
+204.
+205. COPY public.users (id, email, hashed_password, role, created_at) FROM stdin;
+206. \.
+207.
+208.
+209. --
+210. -- TOC entry 4949 (class 0 OID 16654)
+211. -- Dependencies: 225
+212. -- Data for Name: votes; Type: TABLE DATA; Schema: public; Owner: postgres
+213. --
+214.
+215. COPY public.votes (id, poll_id, option_id, source, device_id, created_at) FROM stdin;
+216. \.
+217.
+218.
+219. --
+220. -- TOC entry 4956 (class 0 OID 0)
+221. -- Dependencies: 220
+222. -- Name: system_logs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+223. --
+224.
+225. SELECT pg_catalog.setval('public.system_logs_id_seq', 1, false);
+226.
+227.
+228. --
+229. -- TOC entry 4783 (class 2606 OID 16625)
+230. -- Name: devices devices_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+231. --
+232.
+233. ALTER TABLE ONLY public.devices
+234.    ADD CONSTRAINT devices_pkey PRIMARY KEY (id);
+235.
+236.
+237. --
+238. -- TOC entry 4789 (class 2606 OID 16648)
+239. -- Name: options options_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+240. --
+241.
+242. ALTER TABLE ONLY public.options
+243.    ADD CONSTRAINT options_pkey PRIMARY KEY (id);
+244.
+245.
+246. --
+247. -- TOC entry 4787 (class 2606 OID 16633)
+248. -- Name: polls polls_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+249. --
+250.
+251. ALTER TABLE ONLY public.polls
+252.    ADD CONSTRAINT polls_pkey PRIMARY KEY (id);
+253.
+254.
+255. --
+256. -- TOC entry 4781 (class 2606 OID 16616)
+257. -- Name: system_logs system_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+258. --
+259.
+260. ALTER TABLE ONLY public.system_logs
+261.    ADD CONSTRAINT system_logs_pkey PRIMARY KEY (id);
+262.
+263.
+264. --
+265. -- TOC entry 4778 (class 2606 OID 16605)
+266. -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+267. --
+268.
+269. ALTER TABLE ONLY public.users
+270.    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+271.
+272.
+273. --
+274. -- TOC entry 4791 (class 2606 OID 16661)
+275. -- Name: votes votes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+276. --
+277.
+278. ALTER TABLE ONLY public.votes
+279.    ADD CONSTRAINT votes_pkey PRIMARY KEY (id);
+280.
+281.
+282. --
+283. -- TOC entry 4784 (class 1259 OID 16639)
+284. -- Name: ix_polls_room_id; Type: INDEX; Schema: public; Owner: postgres
+285. --
+286.
+287. CREATE INDEX ix_polls_room_id ON public.polls USING btree (room_id);
+288.
+289.
+290. --
+291. -- TOC entry 4785 (class 1259 OID 16640)
+292. -- Name: ix_polls_title; Type: INDEX; Schema: public; Owner: postgres
+293. --
+294.
+295. CREATE INDEX ix_polls_title ON public.polls USING btree (title);
+296.
+297.
+298. --
+299. -- TOC entry 4779 (class 1259 OID 16617)
+300. -- Name: ix_system_logs_id; Type: INDEX; Schema: public; Owner: postgres
+301. --
+302.
+303. CREATE INDEX ix_system_logs_id ON public.system_logs USING btree (id);
+304.
+305.
+306. --
+307. -- TOC entry 4776 (class 1259 OID 16606)
+308. -- Name: ix_users_email; Type: INDEX; Schema: public; Owner: postgres
+309. --
+310.
+311. CREATE UNIQUE INDEX ix_users_email ON public.users USING btree (email);
+312.
+313.
+314. --
+315. -- TOC entry 4793 (class 2606 OID 16649)
+316. -- Name: options options_poll_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+317. --
+318.
+319. ALTER TABLE ONLY public.options
+320.    ADD CONSTRAINT options_poll_id_fkey FOREIGN KEY (poll_id) REFERENCES public.polls(id);
+321.
+322.
+323. --
+324. -- TOC entry 4792 (class 2606 OID 16634)
+325. -- Name: polls polls_owner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+326. --
+327.
+328. ALTER TABLE ONLY public.polls
+329.    ADD CONSTRAINT polls_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.users(id);
+330.
+331.
+332. --
+333. -- TOC entry 4794 (class 2606 OID 16667)
+334. -- Name: votes votes_option_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+335. --
+336.
+337. ALTER TABLE ONLY public.votes
+338.    ADD CONSTRAINT votes_option_id_fkey FOREIGN KEY (option_id) REFERENCES public.options(id);
+339.
+340.
+341. --
+342. -- TOC entry 4795 (class 2606 OID 16662)
+343. -- Name: votes votes_poll_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+344. --
+345.
+346. ALTER TABLE ONLY public.votes
+347.    ADD CONSTRAINT votes_poll_id_fkey FOREIGN KEY (poll_id) REFERENCES public.polls(id);
+348.
+349.
+350. -- Completed on 2025-12-25 22:54:07
+351.
+352. --
+353. -- PostgreSQL database dump complete
+354. --
+355.
+356. \unrestrict glDPHmcdH5rvAiawignhvecJeHFc5WMdDxcHkVrQw0pbQ7unmENqCcHbh2LAaUe
+
+2
+
+
 
