@@ -1,0 +1,270 @@
+МІНІСТЕРСТВО ОСВІТИ І НАУКИ УКРАЇНИ
+ХАРКІВСЬКИЙ НАЦІОНАЛЬНИЙ УНІВЕРСИТЕТ РАДІОЕЛЕКТРОНІКИ
+КАФЕДРА ПРОГРАМНОЇ ІНЖЕНЕРІЇ
+
+
+
+
+
+ЗВІТ
+До лабораторної роботи №4
+З дисципліни «Аналіз та рефакторинг коду»
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Виконав:
+ст. гр. ПЗПІ-23-4
+Барабанов Р.П.
+
+Перевірив:
+Ст. викладач кафедри ПІ
+Сокорчук Ігор Петрович
+
+
+
+
+
+
+
+
+
+
+
+
+Харків – 2025
+2 ЗАВДАННЯ
+     Метою даної роботи є розробка програмного забезпечення для IoT або SmartDevice пристрою, створеного на базі будь-якої поширеної на сьогодні платформи, придатної для реалізації вбудованих систем (Embedded System).
+     Пристрій повинен бути частиною програмної системи і повинен взаємодіяти з нею. Програмне забезпечення повинно реалізовувати розширену функціональність, що відповідає концепції IoT або SmartDevice, та забезпечувати взаємодію з іншими частинами системи.
+Основні завдання:
+1. Розробити будову програмного забезпечення ІоТ клієнта.
+2. Створити UML діаграму прецедентів для ІоТ клієнта.
+3. Розробити бізнес логіку (математичну обробку повʼязаних із предметною областю даних) та функції налаштування ІоТ клієнта.
+4. Створити діаграму діяльності для ІоТ клієнта.
+5. Створити програмну реалізацію бізнес логіки та функцій налаштування ІоТ клієнта.
+6. Перевірити роботу ІоТ клієнта.
+     
+     
+     
+     
+     
+
+3 ОПИС ВИКОНАНОЇ РОБОТИ
+     У ході лабораторної роботи було розроблено програмне забезпечення для емуляції розумного термінала голосування ("Smart Polling Terminal"). Розробка велася мовою Python з використанням бібліотек rich (для створення консольного графічного інтерфейсу) та requests (для мережевої взаємодії).
+     Архітектура "Розумний клієнт": Пристрій не просто передає натискання кнопки, а є повноцінною системою, що моніторить власний стан. Програма працює у безкінечному циклі, оновлюючи показники віртуальних сенсорів та очікуючи на ввід користувача.
+Конфігурація: Для забезпечення гнучкості налаштування параметри пристрою (адреса сервера, ID кімнати, ID пристрою) винесено у JSON-файл. При запуску програма зчитує цей файл, що дозволяє змінювати параметри без втручання в код.
+Бізнес-логіка (Математична модель): Реалізовано симуляцію фізичних параметрів пристрою для наближення до реальних умов експлуатації:
+Розряд батареї: Використовується лінійна функція зменшення заряду з часом.
+Рівень сигналу (RSSI): Для імітації нестабільності бездротового зв'язку застосовано гармонічну функцію (синусоїду) з додаванням випадкового шуму (random).
+Температура: Емуляція теплового дрейфу компонентів.
+Для візуалізації вимог до системи було створено UML-діаграму прецедентів (Use Case Diagram), яка зображує взаємодію користувача з терміналом та взаємодію термінала з сервером (див. рис. 3.1).
+
+
+
+
+Рисунок 3.1 - UML-діаграма прецедентів IoT клієнта
+
+Для опису алгоритму роботи програмного забезпечення розроблено UML-діаграму діяльності (Activity Diagram). Вона демонструє послідовність дій: завантаження налаштувань, реєстрація в мережі, цикл оновлення сенсорів та обробку голосування (див. рис. 3.2).
+
+Рисунок 3.2 - UML-діаграма діяльності IoT клієнта
+Нижче наведено фрагменти програмного коду, що відповідають завданню.
+1.  def load_config(self, filename):
+2.      """Завантаження параметрів з JSON"""
+3.      try:
+4.          with open(filename, "r") as f:
+5.              self.config = json.load(f)
+6.      except FileNotFoundError:
+7.          console.print("[bold red]Config file not found![/bold red]")
+8.          sys.exit(1)
+Фрагмент бізнес-логіки:
+1.  def update_physics(self):
+2.      """Математична обробка даних сенсорів"""
+3.      uptime = time.time() - self.start_time
+4.      
+5.      # 1. Розрахунок розряду батареї 
+6.      self.battery = max(0, 100 - (uptime * 0.1))
+7.      
+8.      # 2. Розрахунок рівня сигналу RSSI (Синусоїда + випадковий шум)
+9.      # Формула: Base + Amplitude * sin(time) + Noise
+10.     self.rssi = -60 + int(5 * math.sin(uptime)) + random.randint(-2, 2)
+11.     
+12.     # 3. Розрахунок температури (Дрейф)
+13.     self.temperature = 36.6 + math.sin(uptime * 0.5) * 2
+
+
+
+4 ВИСНОВКИ
+     У ході виконання лабораторної роботи було розроблено програмне забезпечення для IoT-клієнта. Реалізовано функції налаштування через конфігураційний файл, що дозволяє гнучко керувати параметрами пристрою. Розроблено та імплементовано бізнес-логіку для математичної емуляції роботи апаратних сенсорів (батареї, термометра, Wi-Fi модуля). Створено зручний інтерфейс користувача та забезпечено надійну взаємодію з сервером через REST API.
+
+
+
+
+
+
+
+
+
+
+
+5 ВИКОРИСТАНІ ДЖЕРЕЛА
+1. Python Requests Library. URL: https://requests.readthedocs.io
+
+2. Rich Library Documentation. URL: https://rich.readthedocs.io
+
+3. JSON Format Specification. URL: https://www.json.org
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ДОДАТОК А 
+Посилання на відео: https://youtu.be/iCc9gsCG2Lg
+00:00 – Вступ
+00:07 – Перегляд створених діаграм
+00:20 – Перегляд файлу config.json
+00:54 – Перегляд основного коду IoT клієнту
+01:25 – Запуску IoT клієнту
+02:02 – Перевірка роботи клієнту
+03:29 – Перевірка сценарію втрати зв’язку з сервером
+04:03 – Подяка
+
+
+
+
+
+
+
+
+
+
+
+ДОДАТОК Б 
+Повний код IoT клєінту:
+1.  import json
+2.  import time
+3.  import math
+4.  import random
+5.  import requests
+6.  import sys
+7.  import os
+8.  from rich.console import Console
+9.  from rich.table import Table
+10. from rich.panel import Panel
+11.
+12. console = Console()
+13.
+14. class SmartPollingTerminal:
+15.     def __init__(self, config_file="config.json"):
+16.         self.load_config(config_file)
+17.         self.battery = 100.0
+18.         self.rssi = -60
+19.         self.temperature = 36.6
+20.         self.is_registered = False
+21.         self.last_log = "System initialized..."
+22.         self.start_time = time.time()
+23.
+24.     def load_config(self, filename):
+25.         try:
+26.             with open(filename, "r") as f:
+27.                 self.config = json.load(f)
+28.         except FileNotFoundError:
+29.             console.print("[bold red]Config file not found![/bold red]")
+30.             sys.exit(1)
+31.
+32.     def register(self):
+33.         url = f"{self.config['server_url']}/iot/register"
+34.         payload = {
+35.             "device_id": self.config['device_id'],
+36.             "device_type": self.config['device_type'],
+37.             "room_id": self.config['room_id']
+38.         }
+39.         try:
+40.             resp = requests.post(url, json=payload, timeout=2)
+41.             if resp.status_code == 200:
+42.                 self.is_registered = True
+43.                 self.last_log = "[green]Connected to Server[/green]"
+44.             else:
+45.                 self.last_log = f"[red]Registration Error: {resp.status_code}[/red]"
+46.         except:
+47.             self.last_log = "[bold red]Server Unreachable[/bold red]"
+48.
+49.     def update_physics(self):
+50.         uptime = time.time() - self.start_time
+51.         self.battery = max(0, 100 - (uptime * 0.1))
+52.         self.rssi = -60 + int(5 * math.sin(uptime)) + random.randint(-2, 2)
+53.         self.temperature = 36.6 + math.sin(uptime * 0.5) * 2
+54.
+55.     def send_click(self, btn_index):
+56.         if not self.is_registered:
+57.             self.last_log = "[yellow]Waiting for connection...[/yellow]"
+58.             self.register()
+59.             return
+60.
+61.         url = f"{self.config['server_url']}/iot/click"
+62.         payload = {"device_id": self.config['device_id'], "button_index": btn_index}
+63.         try:
+64.             resp = requests.post(url, json=payload, timeout=2)
+65.             if resp.status_code == 200:
+66.                 data = resp.json()
+67.                 self.last_log = f"[cyan]VOTED:[/cyan] {data.get('choice')} ({data.get('poll')})"
+68.             else:
+69.                 self.last_log = f"[red]Server Error:[/red] {resp.text}"
+70.         except Exception as e:
+71.             self.last_log = f"[red]Network Error[/red]"
+72.
+73.     def draw_ui(self):
+74.         os.system('cls' if os.name == 'nt' else 'clear')
+75.         table = Table(title=f"Smart Vote Terminal: {self.config['device_id']}", expand=True)
+76.         table.add_column("Sensor", style="cyan")
+77.         table.add_column("Value", style="magenta")
+78.         table.add_column("Status", style="green")
+79.
+80.         bat_style = "green" if self.battery > 30 else "red blink"
+81.         rss_style = "green" if self.rssi > -70 else "yellow"
+82.         
+83.         table.add_row("Battery", f"[{bat_style}]{self.battery:.1f} %[/]", "OK" if self.battery > 0 else "DEAD")
+84.         table.add_row("Signal", f"[{rss_style}]{self.rssi} dBm[/]", "Strong" if self.rssi > -70 else "Weak")
+85.         table.add_row("Temp", f"{self.temperature:.1f} C", "Normal" if self.temperature < 40 else "OVERHEAT")
+86.         table.add_row("Room", self.config['room_id'], "Active")
+87.
+88.         console.print(table)
+89.         console.print(Panel(self.last_log, title="Last Event", border_style="blue"))
+90.         console.print("\n[bold]Controls:[/bold] [0/1] Vote | [r] Reconnect | [q] Quit")
+91.
+92.     def run(self):
+93.         self.register()
+94.         while True:
+95.             self.update_physics()
+96.             self.draw_ui()
+97.             choice = console.input("[bold yellow]Action > [/bold yellow]")
+98.             if choice.lower() == 'q': break
+99.             elif choice.lower() == 'r': self.register()
+100.            elif choice.isdigit(): self.send_click(int(choice))
+101.            else: self.last_log = "[yellow]Invalid command[/yellow]"
+102.
+103. if __name__ == "__main__":
+104.    client = SmartPollingTerminal()
+105.    client.run()
+
+2
+
+
