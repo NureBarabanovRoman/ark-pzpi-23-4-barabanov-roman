@@ -1,0 +1,228 @@
+МІНІСТЕРСТВО ОСВІТИ І НАУКИ УКРАЇНИ
+ХАРКІВСЬКИЙ НАЦІОНАЛЬНИЙ УНІВЕРСИТЕТ РАДІОЕЛЕКТРОНІКИ
+КАФЕДРА ПРОГРАМНОЇ ІНЖЕНЕРІЇ
+
+
+
+
+
+ЗВІТ
+До лабораторної роботи №5
+З дисципліни «Аналіз та рефакторинг коду»
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Виконав:
+ст. гр. ПЗПІ-23-4
+Барабанов Р.П.
+
+Перевірив:
+Ст. викладач кафедри ПІ
+Сокорчук Ігор Петрович
+
+
+
+
+
+
+
+
+
+
+
+
+Харків – 2025
+2 ЗАВДАННЯ
+     1. Розгорнути реалізовану програмну систему.
+     2. Перевірити та налаштувати роботу розгорнутої програмної системи.
+     3. Продемонструвати описану у розділі 2.2 Vision & Scope функціональність програмної системи.
+     4. Створити відеозапис демонстрації функціональності та завантажити його у свій канал на YouTube.  При завантаженні відеозапису потрібно обовʼязково встановити у налаштуваннях для цього відео українську мову як мову відео та мову субтитрів до відео.
+     5. Створити хронологічний опис (хвилина:секунда) демонстрації та додати цей опис до опису відео.
+     6. Створити звіт до лабораторної роботи;
+     7. Експортувати створений звіт у формат PDF та завантажити його на платформу dl.nure.ua.
+     8. Експортувати увесь створений звіт у текстовий файл з кодуванням UTF-8 та записати цей файл у GitHub репозиторій для лабораторних робіт у гілку репозиторію main.
+     
+     
+     
+     
+
+3 ОПИС ВИКОНАНОЇ РОБОТИ
+3.1 Інженерні рішення щодо автоматизації розгортання
+     Для забезпечення надійності та відтворюваності процесу розгортання (Deployment) було відмовлено від ручного налаштування середовища на користь автоматизації (Infrastructure as Code approach). Розроблено набір скриптів на мові PowerShell, які автоматизують підготовку середовища виконання на ОС Windows.
+Розгортання серверної частини (deploy_server.ps1): 
+Скрипт виконує повний цикл підготовки backend-сервісу:
+1. Перевірка передумов: Автоматична детекція встановленого інтерпретатора Python.
+2. Інтерактивна конфігурація: Скрипт запитує у адміністратора параметри підключення до бази даних (PostgreSQL) або використовує значення за замовчуванням для локального середовища.
+3. Ізоляція середовища: Автоматичне створення віртуального оточення (venv). Це дозволяє уникнути конфліктів версій бібліотек із системними пакетами.
+4. Управління залежностями: Встановлення необхідних бібліотек (fastapi, uvicorn, sqlalchemy) з файлу requirements.txt.
+5. Запуск: Старт ASGI-сервера з використанням підготовленого оточення.
+Розгортання клієнтської частини (deploy_client.ps1): 
+Скрипт емулює процес "прошивки" (Provisioning) вбудованого пристрою:
+1. Валідація конфігурації: Перевірка наявності файлу config.json з налаштуваннями пристрою.
+2. Підготовка Runtime: Створення полегшеного ізольованого середовища (client_venv).
+3. Встановлення драйверів: Інсталяція лише необхідних для клієнта бібліотек (requests, rich), без зайвих серверних залежностей.
+4. Запуск: Емуляція завантаження операційної системи термінала.
+3.2 Демонстрація функціональності У ході розгортання та тестування було підтверджено працездатність наступних сценаріїв:
+1. Автоматизоване налаштування: Скрипти успішно створюють робоче оточення "з нуля" (Cold Start).
+2. IoT Взаємодія: Клієнт успішно підключається до розгорнутого сервера за адресою, вказаною у конфігурації.
+3. Обробка даних: Сервер коректно приймає телеметрію та голоси від клієнта, зберігаючи їх у базі даних PostgreSQL.
+
+
+
+
+
+
+
+
+
+
+
+4 ВИСНОВКИ
+     В результаті виконання лабораторної роботи було успішно розроблено та реалізовано автоматизовані сценарії розгортання (Deployment Scripts) для серверної та клієнтської частин системи.
+     Створений інструментарій дозволяє значно спростити налаштування системи на нових машинах. Скрипт для сервера автоматизує керування залежностями Python та змінними оточення. Скрипт для IoT-клієнта емулює процес прошивки реального пристрою, створюючи ізольоване середовище виконання. Це демонструє перехід від середовища розробки до середовища експлуатації (Production Environment).
+
+
+
+
+
+
+
+
+
+
+
+
+5 ВИКОРИСТАНІ ДЖЕРЕЛА
+1. Python Requests Library. URL: https://requests.readthedocs.io
+
+2. Rich Library Documentation. URL: https://rich.readthedocs.io
+
+3. JSON Format Specification. URL: https://www.json.org
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ДОДАТОК А 
+Посилання на відео: https://youtu.be/lwxDCNm44VM
+00:00 – Вступ
+00:10 – Перегляд скрипту розгортання серверу
+01:52 – Перегляд скрипту розгортання IoT клієнту
+02:47 – Запуск скрипту розгортання серверу
+03:46 – Запуск скрипту розгортання IoT клієнту
+04:25 – Тестування відправки голосу
+04:54 – Перевірка роботи API через Swagger
+
+
+
+
+
+
+
+
+
+
+
+
+ДОДАТОК Б 
+Файл deploy_server.ps1 (Сервер)
+1.  # --- CONFIGURATION DEFAULTS ---
+2.  $defaultHost = "localhost"
+3.  $defaultPort = "5432"
+4.  $defaultUser = "postgres"
+5.  $defaultPass = "password"
+6.  $defaultDB   = "poll_db"
+7.  
+8.  # --- 1. PREREQUISITES CHECK ---
+9.  Write-Host "--- [1/6] Checking Prerequisites ---" -ForegroundColor Cyan
+10. try {
+11.     $pyVersion = python --version 2>&1
+12.     Write-Host " [OK] Python found: $pyVersion" -ForegroundColor Green
+13. } catch {
+14.     Write-Host " [ERROR] Python is not installed." -ForegroundColor Red
+15.     Exit 1
+16. }
+17. 
+18. # --- 2. INTERACTIVE CONFIGURATION ---
+19. Write-Host "`n--- [2/6] Database Configuration ---" -ForegroundColor Cyan
+20. $useDefaults = Read-Host -Prompt "Do you want to use defaults ($defaultHost)? (y/n)"
+21. 
+22. if ($useDefaults -eq 'n') {
+23.     $dbHost = Read-Host -Prompt "Host"
+24.     $dbPort = Read-Host -Prompt "Port"
+25.     $dbUser = Read-Host -Prompt "User"
+26.     $dbPassword = Read-Host -Prompt "Password"
+27.     $dbName = Read-Host -Prompt "Database Name"
+28. } else {
+29.     $dbHost = $defaultHost
+30.     $dbPort = $defaultPort
+31.     $dbUser = $defaultUser
+32.     $dbPassword = $defaultPass
+33.     $dbName = $defaultDB
+34. }
+35. 
+36. # --- 3. ENVIRONMENT SETUP ---
+37. $connectionString = "postgresql+asyncpg://$($dbUser):$($dbPassword)@$($dbHost):$($dbPort)/$($dbName)"
+38. $env:DATABASE_URL = $connectionString
+39. 
+40. # --- 4. VIRTUAL ENVIRONMENT ---
+41. if (-not (Test-Path "venv")) {
+42.     Write-Host " [INIT] Creating virtual environment..."
+43.     python -m venv venv
+44. }
+45. 
+46. # --- 5. DEPENDENCIES ---
+47. Write-Host "Installing requirements..."
+48. .\venv\Scripts\pip install -r requirements.txt
+49. 
+50. # --- 6. START SERVER ---
+51. Write-Host "Starting Server..."
+52. .\venv\Scripts\python main.py
+
+Файл deploy_client.ps1 (Клієнт)
+1.  Write-Host "=== IOT TERMINAL PROVISIONING SYSTEM ===" -ForegroundColor Magenta
+2.  
+3.  # --- 1. CONFIG CHECK ---
+4.  if (Test-Path "config.json") {
+5.      Write-Host " [OK] Config found." -ForegroundColor Green
+6.  } else {
+7.      Write-Host " [ERROR] config.json is missing!" -ForegroundColor Red
+8.      Exit 1
+9.  }
+10. 
+11. # --- 2. PROVISIONING ---
+12. Write-Host "Provisioning Libraries..."
+13. if (-not (Test-Path "client_venv")) {
+14.     python -m venv client_venv
+15. }
+16. 
+17. .\client_venv\Scripts\pip install requests rich --disable-pip-version-check
+18. 
+19. # --- 3. LAUNCH ---
+20. Write-Host "Booting Device..."
+21. .\client_venv\Scripts\python iot_client.py
+2
+
+
