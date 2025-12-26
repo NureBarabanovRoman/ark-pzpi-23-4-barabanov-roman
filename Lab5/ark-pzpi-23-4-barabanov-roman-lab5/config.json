@@ -1,0 +1,9 @@
+{
+  "server_url": "http://127.0.0.1:8000",
+  "device_id": "smart_terminal_01",
+  "room_id": "305",
+  "device_type": "smart_terminal",
+  "battery_capacity_mah": 3000,
+  "avg_consumption_ma": 150,
+  "simulation_speed": 1.0
+}
